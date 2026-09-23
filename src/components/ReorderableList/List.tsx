@@ -11,18 +11,14 @@ interface ListType {
 
 const List: ListType = ({ children }) => {
   const ctx = useContext(ListContext);
-
-  if (!ctx) {
-    return null;
-  }
   return (
     <View style={styles.listContainer}>
       {children}
       <Animated.ScrollView
         contentContainerStyle={styles.scrollViewContentContainer}
       >
-        {[...ctx.items].map(([id, item]) => (
-          <ListItemWrapper key={id}>{item}</ListItemWrapper>
+        {ctx.itemIds.map((id) => (
+          <ListItemWrapper key={id}>{ctx.items.get(id)}</ListItemWrapper>
         ))}
       </Animated.ScrollView>
     </View>

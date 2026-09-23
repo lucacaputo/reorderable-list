@@ -1,8 +1,8 @@
+import List from "@components/ReorderableList/List";
+import ListContextProvider from "@components/ReorderableList/ListContextProvider";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import ListContextProvider from "./src/components/ReorderableList/ListContextProvider";
-import List from "./src/components/ReorderableList/List";
 
 export default function App() {
   return (

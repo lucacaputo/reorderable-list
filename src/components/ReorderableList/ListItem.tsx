@@ -8,22 +8,13 @@ import {
 import { ListContext } from "./ListContext";
 import { View } from "react-native";
 
-type ListItemWrapperProps = {
-  initialIndex: number;
-};
-
 const ListItem = ({ children }: PropsWithChildren) => {
   const id = useId();
   const ctx = useContext(ListContext);
 
   useEffect(() => {
-    if (!ctx) {
-      return;
-    }
     const { registerItem, unregisterItem } = ctx;
-
     registerItem(id, <>{children}</>);
-
     return () => unregisterItem(id);
   }, []);
 
