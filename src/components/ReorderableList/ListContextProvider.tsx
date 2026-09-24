@@ -1,20 +1,30 @@
-import { JSX, PropsWithChildren, useCallback, useMemo, useState } from "react";
-import { ListContext } from "./ListContext";
+import {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { ListContext, ListContextType } from "./ListContext";
+import { useSharedValue } from "react-native-reanimated";
 
 const ListContextProvider = ({ children }: PropsWithChildren) => {
   const [itemIds, setItemIds] = useState<string[]>([]);
-  const [items, setItems] = useState(new Map<string, JSX.Element>());
-  const registerItem = useCallback((id: string, element: JSX.Element) => {
-    setItemIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
-    setItems((prev) => {
-      if (prev.has(id)) {
-        return prev;
-      }
-      const map = new Map(prev);
-      map.set(id, element);
-      return map;
-    });
-  }, []);
+  const [items, setItems] = useState<ListContextType["items"]>(new Map());
+  const registerItem = useCallback<ListContextType["registerItem"]>(
+    (id, element, ref) => {
+      setItemIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+      setItems((prev) => {
+        if (prev.has(id)) {
+          return prev;
+        }
+        const map = new Map(prev);
+        map.set(id, { element, ref });
+        return map;
+      });
+    },
+    [],
+  );
 
   const unregisterItem = useCallback((id: string) => {
     setItemIds((prev) => prev.filter((itemId) => itemId !== id));
@@ -25,14 +35,35 @@ const ListContextProvider = ({ children }: PropsWithChildren) => {
     });
   }, []);
 
+  const itemOrder = useSharedValue<string[]>([]);
+
+  const itemHeights = useSharedValue<Record<string, number>>({});
+
+  const draggingId = useSharedValue<string | null>(null);
+
+  useEffect(() => {
+    itemOrder.set(itemIds);
+  }, [itemIds, itemOrder]);
+
   const value = useMemo(
     () => ({
       itemIds,
       items,
       registerItem,
       unregisterItem,
+      itemOrder,
+      itemHeights,
+      draggingId,
     }),
-    [itemIds, items, registerItem, unregisterItem],
+    [
+      itemIds,
+      items,
+      registerItem,
+      unregisterItem,
+      itemOrder,
+      itemHeights,
+      draggingId,
+    ],
   );
 
   return <ListContext.Provider value={value}>{children}</ListContext.Provider>;

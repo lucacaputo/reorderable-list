@@ -1,4 +1,4 @@
-import { JSX, PropsWithChildren, useContext, Children } from "react";
+import { JSX, PropsWithChildren, useContext } from "react";
 import ListItem, { ListItemWrapper } from "./ListItem";
 import { StyleSheet, View } from "react-native";
 import { ListContext } from "./ListContext";
@@ -10,15 +10,18 @@ interface ListType {
 }
 
 const List: ListType = ({ children }) => {
-  const ctx = useContext(ListContext);
+  const { itemIds, items } = useContext(ListContext);
+
   return (
     <View style={styles.listContainer}>
       {children}
       <Animated.ScrollView
         contentContainerStyle={styles.scrollViewContentContainer}
       >
-        {ctx.itemIds.map((id) => (
-          <ListItemWrapper key={id}>{ctx.items.get(id)}</ListItemWrapper>
+        {itemIds.map((id) => (
+          <ListItemWrapper key={id} itemId={id}>
+            {items.get(id)?.element}
+          </ListItemWrapper>
         ))}
       </Animated.ScrollView>
     </View>
