@@ -6,11 +6,15 @@ import {
   useState,
 } from "react";
 import { ListContext, ListContextType } from "./ListContext";
-import { useSharedValue } from "react-native-reanimated";
+import Animated, {
+  useAnimatedRef,
+  useSharedValue,
+} from "react-native-reanimated";
 
 const ListContextProvider = ({ children }: PropsWithChildren) => {
   const [itemIds, setItemIds] = useState<string[]>([]);
   const [items, setItems] = useState<ListContextType["items"]>(new Map());
+  const [scrollViewHeight, setScrollViewHeight] = useState(0);
   const registerItem = useCallback<ListContextType["registerItem"]>(
     (id, element, ref) => {
       setItemIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
@@ -36,9 +40,9 @@ const ListContextProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   const itemOrder = useSharedValue<string[]>([]);
-
+  const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
   const itemHeights = useSharedValue<Record<string, number>>({});
-
+  const scrollState = useSharedValue(0);
   const draggingId = useSharedValue<string | null>(null);
 
   useEffect(() => {
@@ -54,6 +58,10 @@ const ListContextProvider = ({ children }: PropsWithChildren) => {
       itemOrder,
       itemHeights,
       draggingId,
+      scrollViewRef,
+      scrollViewHeight,
+      setScrollViewHeight,
+      scrollState,
     }),
     [
       itemIds,
@@ -63,6 +71,9 @@ const ListContextProvider = ({ children }: PropsWithChildren) => {
       itemOrder,
       itemHeights,
       draggingId,
+      scrollViewRef,
+      scrollViewHeight,
+      scrollState,
     ],
   );
 

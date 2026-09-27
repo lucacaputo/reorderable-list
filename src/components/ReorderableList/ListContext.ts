@@ -14,6 +14,10 @@ type ListContextType = {
   itemOrder: SharedValue<string[]>;
   itemHeights: SharedValue<Record<string, number>>;
   draggingId: SharedValue<string | null>;
+  scrollViewRef: AnimatedRef<Animated.ScrollView> | null;
+  scrollViewHeight: number;
+  setScrollViewHeight: (h: number) => void;
+  scrollState: SharedValue<number>;
 };
 
 const ListContext = createContext<ListContextType>({
@@ -24,6 +28,10 @@ const ListContext = createContext<ListContextType>({
   itemOrder: makeMutable([] as string[]),
   itemHeights: makeMutable({} as Record<string, number>),
   draggingId: makeMutable(null as string | null),
+  scrollViewHeight: 0,
+  scrollViewRef: null,
+  setScrollViewHeight: () => {},
+  scrollState: makeMutable(0),
 });
 
 export { type ListContextType, ListContext };

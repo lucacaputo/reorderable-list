@@ -10,6 +10,9 @@ import { ListContext } from "./ListContext";
 import Animated, {
   cancelAnimation,
   Easing,
+  measure,
+  scrollTo,
+  useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
@@ -23,14 +26,13 @@ import { scheduleOnUI } from "react-native-worklets";
 const ListItem = ({ children }: PropsWithChildren) => {
   const id = useId();
   const ctx = useContext(ListContext);
-
   const ref = useAnimatedRef<Animated.View>();
 
   useEffect(() => {
     const { registerItem, unregisterItem } = ctx;
     registerItem(id, <>{children}</>, ref);
     return () => unregisterItem(id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return null;
@@ -44,8 +46,15 @@ const ListItemWrapper = ({
   children,
   itemId,
 }: PropsWithChildren<ListItemWrapperProps>) => {
-  const { items, itemOrder, itemHeights, draggingId } =
-    useContext(ListContext);
+  const {
+    items,
+    itemOrder,
+    itemHeights,
+    draggingId,
+    scrollViewHeight,
+    scrollViewRef,
+    scrollState,
+  } = useContext(ListContext);
   const currentTranslation = useSharedValue(0);
   const translation = useDerivedValue(() => {
     const heights = itemHeights.get();
@@ -58,7 +67,6 @@ const ListItemWrapper = ({
   });
 
   const itemRef = items.get(itemId)?.ref;
-
   const scaling = useSharedValue(1);
 
   const onLayout = useCallback(
@@ -72,14 +80,39 @@ const ListItemWrapper = ({
     },
     [itemId, itemHeights],
   );
+  const listPosition = useSharedValue(0);
+  const initialScrollState = useSharedValue(0);
+  const itemRelativePosition = useSharedValue(0);
 
   const panGesture = usePanGesture({
+    activateAfterLongPress: 150,
     onBegin: () => {
-      draggingId.set(itemId);
-      scaling.set(withTiming(0.92, { duration: 150, easing: Easing.linear }));
+      scaling.set(withTiming(0.92, { duration: 150, easing: Easing.bounce }));
     },
-    onUpdate: ({ changeY }) => {
+    onActivate: () => {
+      if (!scrollViewRef) {
+        return;
+      }
+      draggingId.set(itemId);
+      const pos = measure(scrollViewRef)?.pageY ?? 0;
+      listPosition.set(pos);
+      initialScrollState.set(scrollState.get());
+    },
+    onUpdate: ({ changeY, absoluteY }) => {
       currentTranslation.set((prev) => prev + changeY);
+      itemRelativePosition.set(absoluteY - listPosition.get());
+    },
+    onFinalize: () => {
+      draggingId.set(null);
+      cancelAnimation(scaling);
+      scaling.set(withSpring(1));
+      currentTranslation.set(withSpring(0));
+    },
+  });
+
+  useAnimatedReaction(
+    () => currentTranslation.get(),
+    (curr) => {
       const heights = itemHeights.get();
       const order = itemOrder.get();
       const thisIndex = order.indexOf(itemId);
@@ -89,41 +122,57 @@ const ListItemWrapper = ({
         (prevId !== undefined ? (heights[prevId] ?? 0) : 0) / 2;
       const nextOffset =
         (nextId !== undefined ? (heights[nextId] ?? 0) : 0) / 2;
-      const dragOffset = currentTranslation.get();
 
-      if (nextId !== undefined && dragOffset > nextOffset) {
+      if (nextId !== undefined && curr > nextOffset) {
         const swapped = order.slice();
         swapped[thisIndex] = order[thisIndex + 1];
         swapped[thisIndex + 1] = order[thisIndex];
         itemOrder.set(swapped);
         currentTranslation.set((prev) => prev - (heights[nextId] ?? 0));
       }
-      if (prevId !== undefined && dragOffset < -prevOffset) {
+      if (prevId !== undefined && curr < -prevOffset) {
         const swapped = order.slice();
         swapped[thisIndex] = order[thisIndex - 1];
         swapped[thisIndex - 1] = order[thisIndex];
         itemOrder.set(swapped);
         currentTranslation.set((prev) => prev + (heights[prevId] ?? 0));
       }
+
+      if (itemRelativePosition.get() >= scrollViewHeight - 50) {
+        if (!scrollViewRef) {
+          return;
+        }
+        scrollTo(scrollViewRef, 0, scrollState.get() + 100, true);
+      }
     },
-    onFinalize: () => {
-      draggingId.set(null);
-      cancelAnimation(scaling);
-      scaling.set(withSpring(1));
-      currentTranslation.set(withSpring(0));
+  );
+
+  useAnimatedReaction(
+    () => scrollState.get(),
+    (curr, prev) => {
+      if (prev && prev + 100 > curr) {
+        const delta = curr - initialScrollState.get();
+        if (draggingId.get() === itemId) {
+          currentTranslation.set((prev) => prev + delta);
+          initialScrollState.set(curr);
+        }
+      }
     },
-    activateAfterLongPress: 150,
-  });
+  );
 
   const rContainerStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateY: translation.get() + currentTranslation.get() },
+      {
+        translateY: translation.get() + currentTranslation.get(),
+      },
       { scale: scaling.get() },
     ],
     position: "absolute",
     width: "100%",
-    zIndex: draggingId.get() === itemId ? 9999 : 0
+    zIndex: draggingId.get() === itemId ? 9999 : 0,
   }));
+
+  //move all the reorder logic into an animated reaction and make the gesture only duty to update the current translation
 
   return (
     <GestureDetector gesture={panGesture}>

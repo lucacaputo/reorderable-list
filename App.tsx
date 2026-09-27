@@ -9,35 +9,142 @@ export default function App() {
   return (
     <GestureHandlerRootView>
       <SafeAreaProvider>
-        <ListContextProvider>
-          <SafeAreaView style={styles.container}>
-            <List>
-              <List.Item>
-                <View style={styles.itemContainer}>
-                  <Text>I am a child</Text>
-                </View>
-              </List.Item>
-              <List.Item>
-                <View style={styles.itemContainer}>
-                  <Text>I am another child</Text>
-                  <Text>I am another child</Text>
-                  <Text>I am another child</Text>
-                </View>
-              </List.Item>
-              <List.Item>
-                <View style={styles.itemContainer}>
-                  <Text>I am another child</Text>
-                  <Text>I am another child</Text>
-                </View>
-              </List.Item>
-              <List.Item>
-                <View style={styles.itemContainer}>
-                  <Text>I am another child</Text>
-                </View>
-              </List.Item>
-            </List>
-          </SafeAreaView>
-        </ListContextProvider>
+        <View style={{ height: 500 }}>
+          <ListContextProvider>
+            <SafeAreaView style={styles.container}>
+              <List>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am a child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am another child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am another child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+                <List.Item>
+                  <View style={styles.itemContainer}>
+                    <View style={styles.innerItem}>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                      <Text>I am another child</Text>
+                    </View>
+                  </View>
+                </List.Item>
+              </List>
+            </SafeAreaView>
+          </ListContextProvider>
+        </View>
         <StatusBar style="auto" />
       </SafeAreaProvider>
     </GestureHandlerRootView>
@@ -50,9 +157,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   itemContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  innerItem: {
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 8,
     padding: 16,
-    borderWidth: 2,
-    borderColor: "teal",
     justifyContent: "center",
     alignItems: "center",
   },
