@@ -5,7 +5,7 @@ import {
   useEffect,
   useId,
 } from "react";
-import { LayoutChangeEvent } from "react-native";
+import { LayoutChangeEvent, StyleSheet } from "react-native";
 import { ListContext } from "./ListContext";
 import Animated, {
   cancelAnimation,
@@ -14,7 +14,6 @@ import Animated, {
   interpolate,
   measure,
   scrollTo,
-  useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
@@ -87,26 +86,54 @@ const ListItemWrapper = ({
     [itemId, itemHeights],
   );
   const listPosition = useSharedValue(0);
-  const initialScrollState = useSharedValue(0);
+  const autoScrollOffset = useSharedValue(0);
   const itemRelativePosition = useSharedValue(0);
+
+  const maybeSwap = () => {
+    "worklet";
+    const curr = currentTranslation.get();
+    const heights = itemHeights.get();
+    const order = itemOrder.get();
+    const thisIndex = order.indexOf(itemId);
+    const prevId = order[thisIndex - 1];
+    const nextId = order[thisIndex + 1];
+    const prevOffset = (prevId !== undefined ? (heights[prevId] ?? 0) : 0) / 2;
+    const nextOffset = (nextId !== undefined ? (heights[nextId] ?? 0) : 0) / 2;
+
+    if (nextId !== undefined && curr > nextOffset) {
+      const swapped = order.slice();
+      swapped[thisIndex] = order[thisIndex + 1];
+      swapped[thisIndex + 1] = order[thisIndex];
+      itemOrder.set(swapped);
+      currentTranslation.set(curr - (heights[nextId] ?? 0));
+    } else if (prevId !== undefined && curr < -prevOffset) {
+      const swapped = order.slice();
+      swapped[thisIndex] = order[thisIndex - 1];
+      swapped[thisIndex - 1] = order[thisIndex];
+      itemOrder.set(swapped);
+      currentTranslation.set(curr + (heights[prevId] ?? 0));
+    }
+  };
 
   const panGesture = usePanGesture({
     activateAfterLongPress: 150,
     onBegin: () => {
       scaling.set(withTiming(0.92, { duration: 150, easing: Easing.bounce }));
     },
-    onActivate: () => {
+    onActivate: ({ absoluteY }) => {
       if (!flashListRef) {
         return;
       }
       draggingId.set(itemId);
       const pos = measure(flashListRef)?.pageY ?? 0;
       listPosition.set(pos);
-      initialScrollState.set(scrollState.get());
+      itemRelativePosition.set(absoluteY - pos);
+      autoScrollOffset.set(scrollState.get());
     },
     onUpdate: ({ changeY, absoluteY }) => {
       currentTranslation.set((prev) => prev + changeY);
       itemRelativePosition.set(absoluteY - listPosition.get());
+      maybeSwap();
     },
     onFinalize: () => {
       draggingId.set(null);
@@ -115,36 +142,6 @@ const ListItemWrapper = ({
       currentTranslation.set(withSpring(0));
     },
   });
-
-  useAnimatedReaction(
-    () => currentTranslation.get(),
-    (curr) => {
-      const heights = itemHeights.get();
-      const order = itemOrder.get();
-      const thisIndex = order.indexOf(itemId);
-      const prevId = order[thisIndex - 1];
-      const nextId = order[thisIndex + 1];
-      const prevOffset =
-        (prevId !== undefined ? (heights[prevId] ?? 0) : 0) / 2;
-      const nextOffset =
-        (nextId !== undefined ? (heights[nextId] ?? 0) : 0) / 2;
-
-      if (nextId !== undefined && curr > nextOffset) {
-        const swapped = order.slice();
-        swapped[thisIndex] = order[thisIndex + 1];
-        swapped[thisIndex + 1] = order[thisIndex];
-        itemOrder.set(swapped);
-        currentTranslation.set((prev) => prev - (heights[nextId] ?? 0));
-      }
-      if (prevId !== undefined && curr < -prevOffset) {
-        const swapped = order.slice();
-        swapped[thisIndex] = order[thisIndex - 1];
-        swapped[thisIndex - 1] = order[thisIndex];
-        itemOrder.set(swapped);
-        currentTranslation.set((prev) => prev + (heights[prevId] ?? 0));
-      }
-    },
-  );
 
   useFrameCallback(() => {
     if (draggingId.get() !== itemId || !flashListRef) {
@@ -180,21 +177,19 @@ const ListItemWrapper = ({
     const heights = itemHeights.get();
     const contentHeight = Object.values(heights).reduce((acc, h) => acc + h, 0);
     const maxScroll = Math.max(0, contentHeight - scrollViewHeight);
-    const next = Math.min(maxScroll, Math.max(0, scrollState.get() + speed));
+    const current = autoScrollOffset.get();
+    const next = Math.min(maxScroll, Math.max(0, current + speed));
+    const delta = next - current;
 
+    if (delta === 0) {
+      return;
+    }
+
+    autoScrollOffset.set(next);
+    currentTranslation.set((prev) => prev + delta);
+    maybeSwap();
     scrollTo(flashListRef, 0, next, false);
   });
-
-  useAnimatedReaction(
-    () => scrollState.get(),
-    (curr) => {
-      const delta = curr - initialScrollState.get();
-      if (draggingId.get() === itemId) {
-        currentTranslation.set((prev) => prev + delta);
-        initialScrollState.set(curr);
-      }
-    },
-  );
 
   const rContainerStyle = useAnimatedStyle(() => ({
     transform: [
@@ -203,19 +198,27 @@ const ListItemWrapper = ({
       },
       { scale: scaling.get() },
     ],
-    position: "absolute",
-    width: "100%",
-    zIndex: draggingId.get() === itemId ? 10 : 1,
   }));
 
   return (
     <GestureDetector gesture={panGesture}>
-      <Animated.View ref={itemRef} onLayout={onLayout} style={rContainerStyle}>
+      <Animated.View
+        ref={itemRef}
+        onLayout={onLayout}
+        style={[styles.container, rContainerStyle]}
+      >
         {children}
       </Animated.View>
     </GestureDetector>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    position: "absolute",
+    width: "100%",
+  },
+});
 
 export { ListItemWrapper };
 export default ListItem;

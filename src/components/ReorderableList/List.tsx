@@ -1,10 +1,11 @@
-import { JSX, PropsWithChildren, useContext } from "react";
+import { ComponentProps, JSX, PropsWithChildren, useContext } from "react";
 import ListItem, { ListItemWrapper } from "./ListItem";
 import { StyleSheet, View } from "react-native";
 import { ListContext } from "./ListContext";
 import Animated, {
   useAnimatedProps,
   useAnimatedScrollHandler,
+  useAnimatedStyle,
   useDerivedValue,
 } from "react-native-reanimated";
 import { FlashList, FlashListProps } from "@shopify/flash-list";
@@ -16,6 +17,24 @@ interface ListType {
 
 const AnimatedFlashList =
   Animated.createAnimatedComponent<typeof FlashList<string>>(FlashList);
+
+const Cell = ({
+  index,
+  style,
+  ...props
+}: ComponentProps<typeof Animated.View> & { index: number }) => {
+  const { itemIds, draggingId } = useContext(ListContext);
+  const itemId = itemIds[index];
+  const rStyle = useAnimatedStyle(() => {
+    const isDragging = draggingId.get() === itemId;
+    return {
+      zIndex: isDragging ? 1 : 0,
+      elevation: isDragging ? 1 : 0,
+    };
+  });
+
+  return <Animated.View {...props} style={[style, rStyle]} />;
+};
 
 const List: ListType = ({ children }) => {
   const {
@@ -66,6 +85,7 @@ const List: ListType = ({ children }) => {
           </ListItemWrapper>
         )}
         animatedProps={animatedProps}
+        CellRendererComponent={Cell}
       />
     </View>
   );
