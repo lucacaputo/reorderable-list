@@ -3,22 +3,26 @@ import ListItem, { ListItemWrapper } from "./ListItem";
 import { StyleSheet, View } from "react-native";
 import { ListContext } from "./ListContext";
 import Animated, {
+  useAnimatedProps,
   useAnimatedScrollHandler,
-  useAnimatedStyle,
   useDerivedValue,
 } from "react-native-reanimated";
+import { FlashList, FlashListProps } from "@shopify/flash-list";
 
 interface ListType {
   (props: PropsWithChildren): JSX.Element | null;
   Item: typeof ListItem;
 }
 
+const AnimatedFlashList =
+  Animated.createAnimatedComponent<typeof FlashList<string>>(FlashList);
+
 const List: ListType = ({ children }) => {
   const {
     itemIds,
     items,
     setScrollViewHeight,
-    scrollViewRef,
+    flashListRef,
     scrollState,
     itemHeights,
   } = useContext(ListContext);
@@ -33,8 +37,12 @@ const List: ListType = ({ children }) => {
     Object.values(itemHeights.get()).reduce((acc, curr) => acc + curr, 0),
   );
 
-  const rScrollStyle = useAnimatedStyle(() => ({
-    height: listHeight.get(),
+  const animatedProps = useAnimatedProps<
+    FlashListProps<(typeof itemIds)[number]>
+  >(() => ({
+    contentContainerStyle: {
+      height: listHeight.get(),
+    },
   }));
 
   return (
@@ -47,25 +55,23 @@ const List: ListType = ({ children }) => {
       }
     >
       {children}
-      <Animated.ScrollView
-        contentContainerStyle={styles.scrollViewContentContainer}
-        ref={scrollViewRef}
+      <AnimatedFlashList
+        ref={flashListRef}
         onScroll={onScroll}
-      >
-        <Animated.View style={rScrollStyle}>
-          {itemIds.map((id) => (
-            <ListItemWrapper key={id} itemId={id}>
-              {items.get(id)?.element}
-            </ListItemWrapper>
-          ))}
-        </Animated.View>
-      </Animated.ScrollView>
+        data={itemIds}
+        keyExtractor={(id) => id}
+        renderItem={({ item }) => (
+          <ListItemWrapper itemId={item}>
+            {items.get(item)?.element}
+          </ListItemWrapper>
+        )}
+        animatedProps={animatedProps}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollViewContentContainer: { flexGrow: 1 },
   listContainer: {
     flex: 1,
   },

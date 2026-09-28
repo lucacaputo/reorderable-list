@@ -6,10 +6,8 @@ import {
   useState,
 } from "react";
 import { ListContext, ListContextType } from "./ListContext";
-import Animated, {
-  useAnimatedRef,
-  useSharedValue,
-} from "react-native-reanimated";
+import { useAnimatedRef, useSharedValue } from "react-native-reanimated";
+import { FlashListRef } from "@shopify/flash-list";
 
 const ListContextProvider = ({ children }: PropsWithChildren) => {
   const [itemIds, setItemIds] = useState<string[]>([]);
@@ -40,7 +38,7 @@ const ListContextProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   const itemOrder = useSharedValue<string[]>([]);
-  const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
+  const flashListRef = useAnimatedRef<FlashListRef<string>>();
   const itemHeights = useSharedValue<Record<string, number>>({});
   const scrollState = useSharedValue(0);
   const draggingId = useSharedValue<string | null>(null);
@@ -58,7 +56,7 @@ const ListContextProvider = ({ children }: PropsWithChildren) => {
       itemOrder,
       itemHeights,
       draggingId,
-      scrollViewRef,
+      flashListRef,
       scrollViewHeight,
       setScrollViewHeight,
       scrollState,
@@ -71,7 +69,7 @@ const ListContextProvider = ({ children }: PropsWithChildren) => {
       itemOrder,
       itemHeights,
       draggingId,
-      scrollViewRef,
+      flashListRef,
       scrollViewHeight,
       scrollState,
     ],

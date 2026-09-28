@@ -52,7 +52,7 @@ const ListItemWrapper = ({
     itemHeights,
     draggingId,
     scrollViewHeight,
-    scrollViewRef,
+    flashListRef,
     scrollState,
   } = useContext(ListContext);
   const currentTranslation = useSharedValue(0);
@@ -90,11 +90,11 @@ const ListItemWrapper = ({
       scaling.set(withTiming(0.92, { duration: 150, easing: Easing.bounce }));
     },
     onActivate: () => {
-      if (!scrollViewRef) {
+      if (!flashListRef) {
         return;
       }
       draggingId.set(itemId);
-      const pos = measure(scrollViewRef)?.pageY ?? 0;
+      const pos = measure(flashListRef)?.pageY ?? 0;
       listPosition.set(pos);
       initialScrollState.set(scrollState.get());
     },
@@ -139,23 +139,21 @@ const ListItemWrapper = ({
       }
 
       if (itemRelativePosition.get() >= scrollViewHeight - 50) {
-        if (!scrollViewRef) {
+        if (!flashListRef) {
           return;
         }
-        scrollTo(scrollViewRef, 0, scrollState.get() + 100, true);
+        scrollTo(flashListRef, 0, scrollState.get() + 100, true);
       }
     },
   );
 
   useAnimatedReaction(
     () => scrollState.get(),
-    (curr, prev) => {
-      if (prev && prev + 100 > curr) {
-        const delta = curr - initialScrollState.get();
-        if (draggingId.get() === itemId) {
-          currentTranslation.set((prev) => prev + delta);
-          initialScrollState.set(curr);
-        }
+    (curr) => {
+      const delta = curr - initialScrollState.get();
+      if (draggingId.get() === itemId) {
+        currentTranslation.set((prev) => prev + delta);
+        initialScrollState.set(curr);
       }
     },
   );
@@ -169,10 +167,8 @@ const ListItemWrapper = ({
     ],
     position: "absolute",
     width: "100%",
-    zIndex: draggingId.get() === itemId ? 9999 : 0,
+    zIndex: draggingId.get() === itemId ? 10 : 1,
   }));
-
-  //move all the reorder logic into an animated reaction and make the gesture only duty to update the current translation
 
   return (
     <GestureDetector gesture={panGesture}>
