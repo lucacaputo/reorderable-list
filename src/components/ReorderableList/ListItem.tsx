@@ -10,18 +10,24 @@ import { ListContext } from "./ListContext";
 import Animated, {
   cancelAnimation,
   Easing,
+  Extrapolation,
+  interpolate,
   measure,
   scrollTo,
   useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
+  useFrameCallback,
   useSharedValue,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { GestureDetector, usePanGesture } from "react-native-gesture-handler";
 import { scheduleOnUI } from "react-native-worklets";
+
+const EDGE_THRESHOLD = 60;
+const MAX_AUTO_SCROLL_SPEED = 10;
 
 const ListItem = ({ children }: PropsWithChildren) => {
   const id = useId();
@@ -137,15 +143,47 @@ const ListItemWrapper = ({
         itemOrder.set(swapped);
         currentTranslation.set((prev) => prev + (heights[prevId] ?? 0));
       }
-
-      if (itemRelativePosition.get() >= scrollViewHeight - 50) {
-        if (!flashListRef) {
-          return;
-        }
-        scrollTo(flashListRef, 0, scrollState.get() + 100, true);
-      }
     },
   );
+
+  useFrameCallback(() => {
+    if (draggingId.get() !== itemId || !flashListRef) {
+      return;
+    }
+
+    const relativePosition = itemRelativePosition.get();
+    const bottomOvershoot =
+      relativePosition - (scrollViewHeight - EDGE_THRESHOLD);
+    const topOvershoot = EDGE_THRESHOLD - relativePosition;
+
+    let speed = 0;
+    if (bottomOvershoot > 0) {
+      speed = interpolate(
+        bottomOvershoot,
+        [0, EDGE_THRESHOLD],
+        [0, MAX_AUTO_SCROLL_SPEED],
+        Extrapolation.CLAMP,
+      );
+    } else if (topOvershoot > 0) {
+      speed = -interpolate(
+        topOvershoot,
+        [0, EDGE_THRESHOLD],
+        [0, MAX_AUTO_SCROLL_SPEED],
+        Extrapolation.CLAMP,
+      );
+    }
+
+    if (speed === 0) {
+      return;
+    }
+
+    const heights = itemHeights.get();
+    const contentHeight = Object.values(heights).reduce((acc, h) => acc + h, 0);
+    const maxScroll = Math.max(0, contentHeight - scrollViewHeight);
+    const next = Math.min(maxScroll, Math.max(0, scrollState.get() + speed));
+
+    scrollTo(flashListRef, 0, next, false);
+  });
 
   useAnimatedReaction(
     () => scrollState.get(),
