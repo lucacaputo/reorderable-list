@@ -9,6 +9,7 @@ import Animated, {
   useDerivedValue,
 } from "react-native-reanimated";
 import { FlashList, FlashListProps } from "@shopify/flash-list";
+import ListContextProvider from "./ListContextProvider";
 
 interface ListType {
   (props: PropsWithChildren): JSX.Element | null;
@@ -36,7 +37,7 @@ const Cell = ({
   return <Animated.View {...props} style={[style, rStyle]} />;
 };
 
-const List: ListType = ({ children }) => {
+const ListComponent = ({ children }: PropsWithChildren): JSX.Element => {
   const {
     itemIds,
     items,
@@ -96,6 +97,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+const List: ListType = ({ children }) => {
+  return (
+    <ListContextProvider>
+      <ListComponent>{children}</ListComponent>
+    </ListContextProvider>
+  );
+};
 
 List.Item = ListItem;
 export default List;

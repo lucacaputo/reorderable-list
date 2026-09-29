@@ -1,5 +1,4 @@
 import List from "@components/ReorderableList/List";
-import ListContextProvider from "@components/ReorderableList/ListContextProvider";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -10,140 +9,138 @@ export default function App() {
     <GestureHandlerRootView>
       <SafeAreaProvider>
         <View style={{ height: 500 }}>
-          <ListContextProvider>
-            <SafeAreaView style={styles.container}>
-              <List>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am a child</Text>
-                    </View>
+          <SafeAreaView style={styles.container}>
+            <List>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am a child</Text>
                   </View>
-                </List.Item>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                    </View>
+                </View>
+              </List.Item>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
                   </View>
-                </List.Item>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                    </View>
+                </View>
+              </List.Item>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
                   </View>
-                </List.Item>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am another child</Text>
-                    </View>
+                </View>
+              </List.Item>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am another child</Text>
                   </View>
-                </List.Item>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am another child</Text>
-                    </View>
+                </View>
+              </List.Item>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am another child</Text>
                   </View>
-                </List.Item>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                    </View>
+                </View>
+              </List.Item>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
                   </View>
-                </List.Item>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                    </View>
+                </View>
+              </List.Item>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
                   </View>
-                </List.Item>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                    </View>
+                </View>
+              </List.Item>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
                   </View>
-                </List.Item>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                    </View>
+                </View>
+              </List.Item>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
                   </View>
-                </List.Item>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                    </View>
+                </View>
+              </List.Item>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
                   </View>
-                </List.Item>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                    </View>
+                </View>
+              </List.Item>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
                   </View>
-                </List.Item>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                    </View>
+                </View>
+              </List.Item>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
                   </View>
-                </List.Item>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                    </View>
+                </View>
+              </List.Item>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
                   </View>
-                </List.Item>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                    </View>
+                </View>
+              </List.Item>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
                   </View>
-                </List.Item>
-                <List.Item>
-                  <View style={styles.itemContainer}>
-                    <View style={styles.innerItem}>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                      <Text>I am another child</Text>
-                    </View>
+                </View>
+              </List.Item>
+              <List.Item>
+                <View style={styles.itemContainer}>
+                  <View style={styles.innerItem}>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
+                    <Text>I am another child</Text>
                   </View>
-                </List.Item>
-              </List>
-            </SafeAreaView>
-          </ListContextProvider>
+                </View>
+              </List.Item>
+            </List>
+          </SafeAreaView>
         </View>
         <StatusBar style="auto" />
       </SafeAreaProvider>
